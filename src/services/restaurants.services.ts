@@ -1,5 +1,5 @@
 import RestaurantsModel, { IRestaurants } from "../model/restaurants.model";
-import DishesModel from "../model/dishs.model";
+import DishesModel from "../model/subTopics/subTopics.model";
 
 exports.getRestaurants = async () => {
   try {

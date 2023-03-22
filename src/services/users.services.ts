@@ -1,5 +1,5 @@
 import { Error } from "mongoose";
-import UsersModel from "../model/users.model";
+import UsersModel from "../model/users/users.model";
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 interface IUsers {

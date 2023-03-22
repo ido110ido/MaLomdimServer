@@ -3,6 +3,6 @@
  "compilerOptions": {
    "outDir": "dist"
  },
- "include": ["src"],
+ "include": ["src", "src/model/mainSub/mainSub.model.ts"],
  "exclude": ["node_modules"]
 }

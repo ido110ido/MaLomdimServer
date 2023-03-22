@@ -5,14 +5,14 @@ export interface IUsers {
   last_name: string;
   email: string;
   password: string;
-  userType: string;
+  role: string;
 }
 const userSchema: Schema = new Schema<IUsers>({
   first_name: { type: String, default: null },
   last_name: { type: String, default: null },
   email: { type: String, unique: true },
   password: { type: String },
-  userType: { type: String, default: "user" },
+  role: { type: String, default: "student" },
 });
 
 const UsersModel: Model<IUsers> = mongoose.model<IUsers>("users", userSchema);

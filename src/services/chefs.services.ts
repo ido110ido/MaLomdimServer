@@ -1,4 +1,4 @@
-import ChefsModel, { IChef } from "../model/chefs.model";
+import ChefsModel, { IChef } from "../model/mainSub/mainSub.model";
 exports.getChefs = async () => {
   try {
     const _chefs = await ChefsModel.find();

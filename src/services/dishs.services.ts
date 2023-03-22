@@ -1,4 +1,4 @@
-import DishesModel from "../model/dishs.model";
+import DishesModel from "../model/subTopics/subTopics.model";
 export interface IDIshAction {
   resturantId: string;
   DayPart: "Breakfast" | "Launch" | "Dinner";
