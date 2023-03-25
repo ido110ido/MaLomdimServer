@@ -7,8 +7,8 @@ import {
   removeMainSubject,
   updateMainSubject,
   updateSubjectOrder,
-} from "../controller/mainSub/mainSub.controllers";
-const verify = require("../verifay/verifay");
+} from "../../controller/mainSub/mainSub.controllers";
+// const verify = require("../../verifay/verifay");
 const router = express.Router();
 
 router.get("/", getTodayMainSub);

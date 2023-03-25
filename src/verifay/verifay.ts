@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 require("dotenv").config();
-exports.adminVerify = (role: string) => {
+export const adminVerify = (role: string) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(" ")[1];
 
