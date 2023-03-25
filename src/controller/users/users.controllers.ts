@@ -17,7 +17,7 @@ exports.logIn = async (req: Request, res: Response) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       // Create token
       const token = jwt.sign(
-        { user_id: user._id, email, userType: user.userType },
+        { user_id: user._id, email, userType: user.role },
         process.env.TOKEN_KEY as string,
         {
           expiresIn: "2h",
@@ -58,7 +58,7 @@ exports.signUp = async (req: Request, res: Response) => {
     user.save();
     // Create token
     const token = jwt.sign(
-      { user_id: user._id, email, userType: user.userType },
+      { user_id: user._id, email, userType: user.role },
       process.env.TOKEN_KEY as string,
       {
         expiresIn: "2h",

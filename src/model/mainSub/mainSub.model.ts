@@ -2,18 +2,18 @@ import mongoose from "mongoose";
 import { Schema, Document, Model } from "mongoose";
 export interface IMainSub {
   title: string;
-  description: string;
+  description?: string;
   startDate: number;
-  endDate: number;
-  nextMainSub: string;
-  head: boolean;
+  numOfDays: number;
+  nextMainSub: String | null;
+  head?: boolean;
 }
 const mainSubSchema: Schema = new Schema<IMainSub>({
   title: { type: String, required: true },
+  numOfDays: { type: Number, required: true },
   description: { type: String, required: false },
-  startDate: { type: Number, required: true },
-  endDate: { type: Number, required: true },
-  nextMainSub: { type: String, default: null },
+  startDate: { type: Number, default: Date.now() },
+  nextMainSub: { type: String || null, default: null },
   head: { type: Boolean, default: false },
 });
 

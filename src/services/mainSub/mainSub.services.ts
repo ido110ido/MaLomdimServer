@@ -9,33 +9,16 @@ import {
   getMainSubSubTopic,
   removeMainSubTopics,
 } from "../subTopics/subTopics.services";
-import { ObjectId } from "mongoose";
-const materialsServices = require("../../services/materials/materials.services");
-const subTopicServices = require("../../services/materials/subTopics.services");
-
-//remove main sub, delete also related sub topics
-export const removeMainSub = async (id: string) => {
-  try {
-    //remove all subTopics of main sub
-    await removeMainSubTopics(id);
-    //remove main sub
-    await MainSubModel.findByIdAndDelete(id);
-  } catch (error) {
-    throw Error("Error while removing main subject data");
-  }
-};
-//update main sub
-export const updateMainSub = async (id: string, mainSub: IMainSub) => {
-  try {
-    await MainSubModel.findByIdAndUpdate(id, mainSub);
-    return await MainSubModel.find();
-  } catch (error) {
-    throw Error("update main subject failed");
-  }
-};
+import { Model, ObjectId } from "mongoose";
+const dayNumVal: number = 86400000;
+interface IMainSubDatesValue {
+  id: string;
+  beginsDay: number;
+  endDate: number;
+}
 
 //getting data
-//get all main subs
+//get all main subs - its working :)
 export const getMainSubs = async () => {
   try {
     const _mainSubs = await MainSubModel.find();
@@ -44,7 +27,7 @@ export const getMainSubs = async () => {
     throw Error("Error while getting main subjects data");
   }
 };
-//get all data of single main sub
+//get all data of single main sub- its working :)
 export const getSingleMainSubData = async (id: string) => {
   try {
     //get main sub
@@ -69,93 +52,182 @@ export const getSingleMainSubData = async (id: string) => {
       subTopicsList: _subTopicList,
       materialsList: _materialsList.flat(),
     };
-  } catch (error) {
-    throw new Error("Error while getting single mainSubject data");
+  } catch (error: any) {
+    throw new Error(
+      "Error while getting single mainSubject data:" + error.message
+    );
   }
 };
-//get today data of single main sub
+//get today data of single main sub- its working :)
 export const getTodayMainSubMaterials = async () => {
   try {
-    const today: number = Date.now();
-    //find main sub that learned today
-    const _currentSubjectDate = await MainSubModel.findOne(
-      { startDate: { $gte: today }, endDate: { $gte: today } },
-      { _id: true }
-    );
-    if (_currentSubjectDate) {
-      return await getSingleMainSubData(_currentSubjectDate._id.toString());
+    // Get the current time in milliseconds
+    const today = Date.now();
+    // Find the first main subject in the database
+    let indexMainSub = await MainSubModel.findOne({ head: true });
+    if (!indexMainSub) {
+      throw new Error("There are no main subjects in the course yet");
     }
+    // Create an array of objects with the start and end dates of each main subject
+    const listOfMainSubDatesValue = [
+      {
+        id: indexMainSub._id.toString(),
+        beginsDay: indexMainSub.startDate,
+        endDate: indexMainSub.startDate + indexMainSub.numOfDays * dayNumVal,
+      },
+    ];
+    while (indexMainSub?.nextMainSub != null) {
+      const prevuesSub = listOfMainSubDatesValue.at(-1);
+      indexMainSub = await MainSubModel.findById(indexMainSub.nextMainSub);
+      if (!indexMainSub || !prevuesSub) {
+        throw new Error("Something went wrong");
+      }
+      listOfMainSubDatesValue.push({
+        id: indexMainSub._id.toString(),
+        beginsDay: prevuesSub.endDate + dayNumVal,
+        endDate:
+          prevuesSub.endDate + dayNumVal + indexMainSub.numOfDays * dayNumVal,
+      });
+    }
+    // Find the main subject that is being learned today
+    const todayMainSub =
+      listOfMainSubDatesValue.find(
+        (obj) => today >= obj.beginsDay && today <= obj.endDate
+      ) || null;
+    if (!todayMainSub) {
+      throw new Error("There are no main subjects today");
+    }
+    // Get the data for the main subject being learned today
+    return await getSingleMainSubData(todayMainSub.id);
   } catch (error) {
-    throw new Error("Error while getting today mainSubject data");
+    throw Error("Error while getting today's main subject data");
   }
 };
 
 //add
-//adding data
+//adding data-its working :)
 export const addingMainSub = async (mainSub: IMainSub) => {
   try {
-    //create new main sub
     const _newMainSub = await MainSubModel.create(mainSub);
-    //if its the first object
-    if ((await MainSubModel.find()).length === 0) {
+    const count = await MainSubModel.countDocuments();
+    if (count === 1) {
       _newMainSub.head = true;
       await _newMainSub.save();
       return await MainSubModel.find();
     }
-    //find last date
-    const result = await MainSubModel.aggregate([
-      {
-        $group: {
-          _id: null,
-          maxEndDate: { $max: "$endDate" },
-        },
-      },
-    ]);
-    const lastDate: number = result[0].maxEndDate;
-    if (_newMainSub.startDate != lastDate) {
-      _newMainSub.startDate = lastDate;
+
+    const lastMainSub = await MainSubModel.findOne({ nextMainSub: null });
+    if (lastMainSub) {
+      lastMainSub.nextMainSub = _newMainSub._id.toString();
+      await lastMainSub.save();
     }
+
+    _newMainSub.head = false;
+    _newMainSub.nextMainSub = null;
     await _newMainSub.save();
-    // await MainSubModel.findOneAndUpdate(
-    //   { nextMainSub: null },
-    //   { $set: { nextMainSub: _newMainSub._id.toString() } }
-    // );
+
     return await MainSubModel.find();
-  } catch (error) {
-    throw Error("adding main subject failed");
+  } catch (error: any) {
+    throw new Error("Failed to add main subject: " + error.message);
   }
 };
+
 //update order of main sub
 export const updateMainSubOrder = async (
   mainSubId: string,
-  newBeforeMainSubId?: string | null
+  newBeforeMainSubId: string | null
 ) => {
   try {
-    if (!newBeforeMainSubId) {
-      newBeforeMainSubId = null;
+    if (mainSubId === newBeforeMainSubId) {
+      return await MainSubModel.find();
     }
+    //find the main sub to move
     const _mainSub = await MainSubModel.findById(mainSubId);
-    const _newBeforeMainSubId = await MainSubModel.findById(newBeforeMainSubId);
     if (!_mainSub) {
       throw new Error("Main subject not found.");
     }
-    //connect the privies Main sub to the next main sub of the current Main
-    await MainSubModel.findOneAndUpdate(
-      { nextMainSub: mainSubId },
-      { $set: { nextMainSub: _mainSub.nextMainSub } }
-    );
-    //connect current main to the new privies Main sub next main sub
-    await MainSubModel.findOneAndUpdate(
-      { _id: mainSubId },
-      { $set: { nextMainSub: _newBeforeMainSubId.nextMainSub } }
-    );
-    //connect the new privies Main sub to the current main sub
-    await MainSubModel.findOneAndUpdate(
-      { _id: _newBeforeMainSubId._id },
-      { $set: { nextMainSub: _mainSub._id.toString() } }
-    );
+    //if the main sub is the first subject
+    if (_mainSub.head) {
+      await MainSubModel.findByIdAndUpdate(_mainSub.nextMainSub, {
+        head: true,
+        startDate: _mainSub.startDate,
+      });
+      await MainSubModel.findByIdAndUpdate(mainSubId, {
+        head: false,
+        startDate: null,
+      });
+    } else {
+      //connect the privies Main sub to the next main sub of the current Main
+      await MainSubModel.findOneAndUpdate(
+        { nextMainSub: mainSubId },
+        { $set: { nextMainSub: _mainSub.nextMainSub } }
+      );
+    }
+    //if no new prevues looker is provide that mean that it became the new head
+    if (newBeforeMainSubId) {
+      const _newBeforeMainSubId = await MainSubModel.findById(
+        newBeforeMainSubId
+      );
+      //connect current main to the new privies Main sub next main sub
+      await MainSubModel.findOneAndUpdate(
+        { _id: mainSubId },
+        { $set: { nextMainSub: _newBeforeMainSubId?.nextMainSub } }
+      );
+      //connect the new privies Main sub to the current main sub
+      await MainSubModel.findOneAndUpdate(
+        { _id: newBeforeMainSubId },
+        { $set: { nextMainSub: mainSubId } }
+      );
+    } else {
+      //what happened if main sub go to top of list
+      //find head main sub and change it
+      const _headMainSub = await MainSubModel.findOne({ head: true });
+      await MainSubModel.findOneAndUpdate(
+        { head: true },
+        { $set: { head: false } }
+      );
+      //make Main sub to be the new head
+      await MainSubModel.findOneAndUpdate(
+        { _id: _mainSub._id },
+        { $set: { nextMainSub: _headMainSub?._id.toString(), head: true } }
+      );
+    }
     return await MainSubModel.find();
   } catch (error) {
     throw Error("change main subject order failed");
+  }
+};
+//update main sub
+export const updateMainSub = async (id: string, mainSub: IMainSub) => {
+  try {
+    await MainSubModel.findByIdAndUpdate(id, mainSub);
+    return await MainSubModel.find();
+  } catch (error) {
+    throw Error("update main subject failed");
+  }
+};
+
+//remove main sub, delete also related sub topics ------- not done
+export const removeMainSub = async (id: string) => {
+  try {
+    const deleteMainSub = await MainSubModel.findById(id);
+    if (!deleteMainSub) {
+      throw new Error("Main subject not found.");
+    }
+    //remove all subTopics of main sub
+    await removeMainSubTopics(id);
+    await MainSubModel.findOneAndUpdate(
+      { nextMainSub: id },
+      { $set: { nextMainSub: deleteMainSub.nextMainSub } },
+      (err: any) => {
+        if (err) {
+        }
+      }
+    );
+
+    //remove main sub
+    await MainSubModel.findByIdAndDelete(id);
+  } catch (error) {
+    throw Error("Error while removing main subject data");
   }
 };
