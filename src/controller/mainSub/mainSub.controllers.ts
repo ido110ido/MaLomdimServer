@@ -4,6 +4,9 @@ import {
   getMainSubs,
   getSingleMainSubData,
   getTodayMainSubMaterials,
+  removeMainSub,
+  updateMainSub,
+  updateMainSubOrder,
 } from "../../services/mainSub/mainSub.services";
 //get controllers
 export const getMainSubsList = async (req: Request, res: Response) => {
@@ -58,28 +61,44 @@ export const addNewMainSubject = async (req: Request, res: Response) => {
     return res.status(400).json({ status: 400, message: error.message });
   }
 };
-
-// exports.getSingleChefs = async (req: Request, res: Response) => {
-//   try {
-//     const chef = await chefsServices.getSingleChefs(req.body.id);
-//     return res.status(200).json({
-//       status: 200,
-//       data: chef,
-//       message: "Successfully chef Retrieved",
-//     });
-//   } catch (e: any) {
-//     return res.status(400).json({ status: 400, message: e.message });
-//   }
-// };
-// exports.removeChef = async (req: Request, res: Response) => {
-//   try {
-//     const chefs = await chefsServices.removeChef(req.body.id);
-//     return res.status(200).json({
-//       status: 200,
-//       data: chefs,
-//       message: "Successfully removed chef",
-//     });
-//   } catch (e: any) {
-//     return res.status(400).json({ status: 400, message: e.message });
-//   }
-// };
+//update
+export const updateSubjectOrder = async (req: Request, res: Response) => {
+  try {
+    const { mainSubId, newBeforeMainSubId } = req.body;
+    const mainSubs = await updateMainSubOrder(mainSubId, newBeforeMainSubId);
+    return res.status(200).json({
+      status: 200,
+      data: mainSubs,
+      message: "Successfully change order of Main Subs",
+    });
+  } catch (error: any) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+};
+export const updateMainSubject = async (req: Request, res: Response) => {
+  try {
+    const { id, newTitle, numOfDays } = req.body;
+    const mainSubs = await updateMainSub(id, newTitle, numOfDays);
+    return res.status(200).json({
+      status: 200,
+      data: mainSubs,
+      message: "Successfully updated Main Sub",
+    });
+  } catch (error: any) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+};
+//remove
+export const removeMainSubject = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.body;
+    const mainSubs = await removeMainSub(id);
+    return res.status(200).json({
+      status: 200,
+      data: mainSubs,
+      message: "Successfully remove Main Sub",
+    });
+  } catch (error: any) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+};

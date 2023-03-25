@@ -16,7 +16,6 @@ interface IMainSubDatesValue {
   beginsDay: number;
   endDate: number;
 }
-
 //getting data
 //get all main subs - its working :)
 export const getMainSubs = async () => {
@@ -69,7 +68,7 @@ export const getTodayMainSubMaterials = async () => {
       throw new Error("There are no main subjects in the course yet");
     }
     // Create an array of objects with the start and end dates of each main subject
-    const listOfMainSubDatesValue = [
+    const listOfMainSubDatesValue: IMainSubDatesValue[] = [
       {
         id: indexMainSub._id.toString(),
         beginsDay: indexMainSub.startDate,
@@ -132,7 +131,8 @@ export const addingMainSub = async (mainSub: IMainSub) => {
   }
 };
 
-//update order of main sub
+//update
+//update order of main sub -its working :) even I cant believe
 export const updateMainSubOrder = async (
   mainSubId: string,
   newBeforeMainSubId: string | null
@@ -197,37 +197,55 @@ export const updateMainSubOrder = async (
     throw Error("change main subject order failed");
   }
 };
-//update main sub
-export const updateMainSub = async (id: string, mainSub: IMainSub) => {
+//update main sub -its working :)
+export const updateMainSub = async (
+  id: string,
+  newTitle: string,
+  numOfDays: number
+) => {
   try {
-    await MainSubModel.findByIdAndUpdate(id, mainSub);
+    await MainSubModel.findByIdAndUpdate(id, {
+      $set: { title: newTitle, numOfDays: numOfDays },
+    });
     return await MainSubModel.find();
   } catch (error) {
     throw Error("update main subject failed");
   }
 };
 
-//remove main sub, delete also related sub topics ------- not done
+//remove
+//remove main sub, delete also related sub topics -its working :)
 export const removeMainSub = async (id: string) => {
   try {
     const deleteMainSub = await MainSubModel.findById(id);
     if (!deleteMainSub) {
       throw new Error("Main subject not found.");
     }
-    //remove all subTopics of main sub
+    // Remove all subTopics of main sub
     await removeMainSubTopics(id);
-    await MainSubModel.findOneAndUpdate(
-      { nextMainSub: id },
-      { $set: { nextMainSub: deleteMainSub.nextMainSub } },
-      (err: any) => {
-        if (err) {
-        }
-      }
-    );
+    if (deleteMainSub.head) {
+      console.log("head");
+      // If the main sub is the head, update the next main sub to be the new head
+      await MainSubModel.findByIdAndUpdate(deleteMainSub.nextMainSub, {
+        $set: {
+          head: true,
+          startDate: deleteMainSub.startDate,
+        },
+      });
+    } else {
+      // If the main sub is not the head, update the previous main sub to point to the next main sub
+      await MainSubModel.findOneAndUpdate(
+        { nextMainSub: id },
+        { $set: { nextMainSub: deleteMainSub.nextMainSub } }
+      );
+    }
 
-    //remove main sub
+    // Remove main sub
     await MainSubModel.findByIdAndDelete(id);
+
+    // Return all remaining main subs
+    return MainSubModel.find();
   } catch (error) {
-    throw Error("Error while removing main subject data");
+    throw new Error("Error while removing main subject data");
   }
 };

@@ -4,14 +4,22 @@ import {
   getMainSubsList,
   getSingleMainSub,
   getTodayMainSub,
+  removeMainSubject,
+  updateMainSubject,
+  updateSubjectOrder,
 } from "../controller/mainSub/mainSub.controllers";
 const verify = require("../verifay/verifay");
 const router = express.Router();
 
 router.get("/", getTodayMainSub);
 router.get("/list", getMainSubsList);
-router.get("/change", getSingleMainSub);
+router.get("/singleSub", getSingleMainSub); // need id: string
+
+//add
 router.post("/", addNewMainSubject);
-// router.post("/add", chefsController.addingChef);
-// router.delete("/", verify.adminVerify("admin"), chefsController.removeChef);
+//update
+router.post("/update", updateMainSubject); // need id: string, newTitle: string, numOfDays: number
+router.post("/updateOrder", updateSubjectOrder); // need mainSubId: string , newBeforeMainSubId: string | null
+//remove
+router.delete("/", removeMainSubject); // need id: string
 export default router;
