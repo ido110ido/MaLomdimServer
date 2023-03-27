@@ -11,8 +11,8 @@ import {
 // const verify = require("../../verifay/verifay");
 const router = express.Router();
 
-router.get("/", getTodayMainSub);
-router.get("/list", getMainSubsList);
+router.get("/", getMainSubsList);
+router.get("/today", getTodayMainSub);
 router.get("/singleSub", getSingleMainSub); // need id: string
 
 //add

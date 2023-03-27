@@ -2,18 +2,22 @@ import express from "express";
 import {
   addNewMaterialStudent,
   addNewMaterialTeacher,
+  getMaterialsTeacher,
   removeMaterialsStudent,
   removeMaterialsTeacher,
   updateMaterialStudent,
   updateMaterialTeacher,
 } from "../../controller/material/material.controllers";
+import { getSubTopicsMaterials } from "../../services/materials/materials.services";
 import { adminVerify } from "../../verifay/verifay";
 
 // const verify = require("../verifay/verifay");
 const router = express.Router();
+//get
+router.get("/", getMaterialsTeacher);
 //add
-router.post("/teacher", adminVerify("teacher"), addNewMaterialTeacher);
-router.post("/", adminVerify("student"), addNewMaterialStudent); // need idMainSub:string
+router.post("/teacher", addNewMaterialTeacher);
+router.post("/", addNewMaterialTeacher); // need idMainSub:string
 //update
 router.post("/teacher/update", adminVerify("teacher"), updateMaterialTeacher); // need id: string, title: string, idMainSub: number
 router.post("/update", adminVerify("student"), updateMaterialStudent); // need id: string, title: string, idMainSub: number ,idMainSub:string

@@ -40,8 +40,8 @@ export const addingNoteMaterials = async (
     const _newMaterials = await materialsModel.create(Materials);
     _newMaterials.save();
     return await getMainSubMaterials(idMainSub);
-  } catch (error) {
-    throw Error("adding Materials failed");
+  } catch (error: any) {
+    throw Error("adding Materials failed: " + error.message);
   }
 };
 //admin update material
@@ -71,7 +71,8 @@ export const updateNoteMaterials = async (
 //get all the sub Topic materials
 export const getSubTopicsMaterials = async (subTopicID: string) => {
   try {
-    const _Materials = await materialsModel.find({ idSubTopic: subTopicID });
+    const _Materials = await materialsModel.find();
+    // const _Materials = await materialsModel.find({ idSubTopic: subTopicID });
     return _Materials;
   } catch (error) {
     throw Error("Error while getting sub topic Materials data");

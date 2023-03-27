@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import {
   addingMainSub,
-  getMainSubs,
+  getMainSubsAndDateList,
   getSingleMainSubData,
   getTodayMainSubMaterials,
   removeMainSub,
@@ -12,7 +12,7 @@ import {
 export const getMainSubsList = async (req: Request, res: Response) => {
   try {
     console.log("a");
-    const mainSubs = await getMainSubs();
+    const mainSubs = await getMainSubsAndDateList();
     return res.status(200).json({
       status: 200,
       data: mainSubs,

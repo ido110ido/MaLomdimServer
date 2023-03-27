@@ -2,12 +2,25 @@ import { Request, Response } from "express";
 import {
   addingMaterials,
   addingNoteMaterials,
+  getSubTopicsMaterials,
   removeMaterial,
   removeNoteMaterial,
   updateMaterials,
   updateNoteMaterials,
 } from "../../services/materials/materials.services";
-
+//get
+export const getMaterialsTeacher = async (req: Request, res: Response) => {
+  try {
+    const material = await getSubTopicsMaterials(req.body);
+    return res.status(200).json({
+      status: 200,
+      data: material,
+      message: "Successfully get material",
+    });
+  } catch (e: any) {
+    return res.status(400).json({ status: 400, message: e.message });
+  }
+};
 //remove
 export const removeMaterialsTeacher = async (req: Request, res: Response) => {
   try {

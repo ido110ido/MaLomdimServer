@@ -13,15 +13,27 @@ import { Model, ObjectId } from "mongoose";
 const dayNumVal: number = 86400000;
 interface IMainSubDatesValue {
   id: string;
+  title: string;
   beginsDay: number;
   endDate: number;
 }
 //getting data
 //get all main subs - its working :)
-export const getMainSubs = async () => {
+export const getMainSubsAndDateList = async () => {
   try {
     const _mainSubs = await MainSubModel.find();
-    return _mainSubs;
+    const mainSubInOrder: IMainSub[] = [];
+    let index = _mainSubs.find((obj) => obj.head === true);
+    while (index?.nextMainSub || index != undefined) {
+      mainSubInOrder.push(index);
+      index = _mainSubs.find(
+        (obj) => obj._id.toString() === index?.nextMainSub
+      );
+    }
+    return {
+      mainSubs: mainSubInOrder,
+      DateList: await listMainSubDateVal(),
+    };
   } catch (error) {
     throw Error("Error while getting main subjects data");
   }
@@ -35,7 +47,7 @@ export const getSingleMainSubData = async (id: string) => {
       throw new Error("Main subject not found.");
     }
     //get next main sub or null if last
-    const _nextSub = await MainSubModel.findById(_mainSub?.nextMainSub);
+    // const _nextSub = await MainSubModel.findById(_mainSub?.nextMainSub);
     //get sub topic list
     const _subTopicList = await getMainSubSubTopic(id);
     //get material list
@@ -46,8 +58,8 @@ export const getSingleMainSubData = async (id: string) => {
       return listOfMaterials || [];
     });
     return {
-      mainSubData: _mainSub,
-      nextSub: _nextSub,
+      mainSubData: _mainSub._id.toString(),
+      // nextSub: _nextSub,
       subTopicsList: _subTopicList,
       materialsList: _materialsList.flat(),
     };
@@ -62,47 +74,22 @@ export const getTodayMainSubMaterials = async () => {
   try {
     // Get the current time in milliseconds
     const today = Date.now();
-    // Find the first main subject in the database
-    let indexMainSub = await MainSubModel.findOne({ head: true });
-    if (!indexMainSub) {
-      throw new Error("There are no main subjects in the course yet");
-    }
-    // Create an array of objects with the start and end dates of each main subject
-    const listOfMainSubDatesValue: IMainSubDatesValue[] = [
-      {
-        id: indexMainSub._id.toString(),
-        beginsDay: indexMainSub.startDate,
-        endDate: indexMainSub.startDate + indexMainSub.numOfDays * dayNumVal,
-      },
-    ];
-    while (indexMainSub?.nextMainSub != null) {
-      const prevuesSub = listOfMainSubDatesValue.at(-1);
-      indexMainSub = await MainSubModel.findById(indexMainSub.nextMainSub);
-      if (!indexMainSub || !prevuesSub) {
-        throw new Error("Something went wrong");
-      }
-      listOfMainSubDatesValue.push({
-        id: indexMainSub._id.toString(),
-        beginsDay: prevuesSub.endDate + dayNumVal,
-        endDate:
-          prevuesSub.endDate + dayNumVal + indexMainSub.numOfDays * dayNumVal,
-      });
-    }
+    const listMainSub: IMainSubDatesValue[] = await listMainSubDateVal();
     // Find the main subject that is being learned today
     const todayMainSub =
-      listOfMainSubDatesValue.find(
+      listMainSub.find(
         (obj) => today >= obj.beginsDay && today <= obj.endDate
       ) || null;
     if (!todayMainSub) {
       throw new Error("There are no main subjects today");
     }
     // Get the data for the main subject being learned today
-    return await getSingleMainSubData(todayMainSub.id);
+    // return await getSingleMainSubData(todayMainSub.id);
+    return todayMainSub.id;
   } catch (error) {
     throw Error("Error while getting today's main subject data");
   }
 };
-
 //add
 //adding data-its working :)
 export const addingMainSub = async (mainSub: IMainSub) => {
@@ -248,4 +235,37 @@ export const removeMainSub = async (id: string) => {
   } catch (error) {
     throw new Error("Error while removing main subject data");
   }
+};
+
+export const listMainSubDateVal = async () => {
+  // Find the first main subject in the database
+  let indexMainSub = await MainSubModel.findOne({ head: true });
+  if (!indexMainSub) {
+    throw new Error("There are no main subjects in the course yet");
+  }
+  // Create an array of objects with the start and end dates of each main subject
+  const listOfMainSubDatesValue: IMainSubDatesValue[] = [
+    {
+      id: indexMainSub._id.toString(),
+      title: indexMainSub.title,
+      beginsDay: indexMainSub.startDate,
+      endDate: indexMainSub.startDate + indexMainSub.numOfDays * dayNumVal,
+    },
+  ];
+  while (indexMainSub?.nextMainSub != null) {
+    const prevuesSub = listOfMainSubDatesValue.at(-1);
+    indexMainSub = await MainSubModel.findById(indexMainSub.nextMainSub);
+    if (!indexMainSub || !prevuesSub) {
+      throw new Error("Something went wrong");
+    }
+    listOfMainSubDatesValue.push({
+      id: indexMainSub._id.toString(),
+      beginsDay: prevuesSub.endDate + dayNumVal,
+      title: indexMainSub.title,
+      endDate:
+        prevuesSub.endDate + dayNumVal + indexMainSub.numOfDays * dayNumVal,
+    });
+  }
+  console.log(listOfMainSubDatesValue);
+  return listOfMainSubDatesValue;
 };

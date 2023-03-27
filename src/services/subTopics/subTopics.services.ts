@@ -6,7 +6,7 @@ import { removeSubTopicMaterials } from "../materials/materials.services";
 //get a main sub SubTopics list or all
 export const getMainSubSubTopic = async (mainSubID: string) => {
   try {
-    const _subTopics = await subTopicsModel.find({ idMainSub: mainSubID });
+    const _subTopics = await subTopicsModel.find();
     return _subTopics;
   } catch (error) {
     throw Error("Error while getting main sub subTopics data");
