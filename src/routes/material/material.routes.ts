@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  addNewMaterialStudent,
   addNewMaterialTeacher,
   getMaterialsTeacher,
   removeMaterialsStudent,
@@ -8,7 +7,6 @@ import {
   updateMaterialStudent,
   updateMaterialTeacher,
 } from "../../controller/material/material.controllers";
-import { getSubTopicsMaterials } from "../../services/materials/materials.services";
 import { adminVerify } from "../../verifay/verifay";
 
 // const verify = require("../verifay/verifay");

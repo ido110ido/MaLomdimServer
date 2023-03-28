@@ -18,16 +18,23 @@ export const getMainSubsAndDateList = async () => {
     const _mainSubs = await MainSubModel.find();
     const mainSubInOrder: IMainSub[] = [];
     let index = _mainSubs.find((obj) => obj.head === true);
+    let indexEndDate: number = 0;
+    if (index) {
+      index.endDate = index.startDate + index.numOfDays * dayNumVal;
+      indexEndDate = index.endDate + dayNumVal;
+    }
     while (index?.nextMainSub || index != undefined) {
       mainSubInOrder.push(index);
       index = _mainSubs.find(
         (obj) => obj._id.toString() === index?.nextMainSub
       );
+      if (index) {
+        index.startDate = indexEndDate;
+        index.endDate = indexEndDate + index.numOfDays * dayNumVal;
+        indexEndDate = index.endDate + dayNumVal;
+      }
     }
-    return {
-      mainSubs: mainSubInOrder,
-      DateList: await listMainSubDateVal(),
-    };
+    return mainSubInOrder;
   } catch (error) {
     throw Error("Error while getting main subjects data");
   }
@@ -40,8 +47,6 @@ export const getSingleMainSubData = async (id: string) => {
     if (!_mainSub) {
       throw new Error("Main subject not found.");
     }
-    //get next main sub or null if last
-    // const _nextSub = await MainSubModel.findById(_mainSub?.nextMainSub);
     //get sub topic list
     const _subTopicList = await getMainSubSubTopic(id);
     //get material list
@@ -68,18 +73,18 @@ export const getTodayMainSubMaterials = async () => {
   try {
     // Get the current time in milliseconds
     const today = Date.now();
-    const listMainSub: IMainSubDatesValue[] = await listMainSubDateVal();
+    const listMainSub: IMainSub[] = await getMainSubsAndDateList();
     // Find the main subject that is being learned today
     const todayMainSub =
       listMainSub.find(
-        (obj) => today >= obj.beginsDay && today <= obj.endDate
+        (obj) => today >= obj.startDate && today <= obj.endDate
       ) || null;
     if (!todayMainSub) {
       throw new Error("There are no main subjects today");
     }
     // Get the data for the main subject being learned today
     // return await getSingleMainSubData(todayMainSub.id);
-    return todayMainSub.id;
+    return todayMainSub;
   } catch (error) {
     throw Error("Error while getting today's main subject data");
   }
@@ -95,7 +100,6 @@ export const addingMainSub = async (mainSub: IMainSub) => {
       await _newMainSub.save();
       return await getMainSubsAndDateList();
     }
-
     const lastMainSub = await MainSubModel.findOne({ nextMainSub: null });
     if (lastMainSub) {
       lastMainSub.nextMainSub = _newMainSub._id.toString();
@@ -111,7 +115,6 @@ export const addingMainSub = async (mainSub: IMainSub) => {
     throw new Error("Failed to add main subject: " + error.message);
   }
 };
-
 //update
 //update order of main sub -its working :) even I cant believe
 export const updateMainSubOrder = async (
@@ -205,7 +208,6 @@ export const removeMainSub = async (id: string) => {
     // Remove all subTopics of main sub
     await removeMainSubTopics(id);
     if (deleteMainSub.head) {
-      console.log("head");
       // If the main sub is the head, update the next main sub to be the new head
       await MainSubModel.findByIdAndUpdate(deleteMainSub.nextMainSub, {
         $set: {
@@ -260,6 +262,5 @@ export const listMainSubDateVal = async () => {
         prevuesSub.endDate + dayNumVal + indexMainSub.numOfDays * dayNumVal,
     });
   }
-  console.log(listOfMainSubDatesValue);
   return listOfMainSubDatesValue;
 };
