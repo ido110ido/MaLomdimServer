@@ -7,7 +7,7 @@ export interface IMaterials {
   body: string;
   category: string;
   codeType:string;
-\
+
 }
 const materialsSchema: Schema = new Schema<IMaterials>({
   idSubTopic: { type: String, required: true },
