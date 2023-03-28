@@ -11,7 +11,6 @@ import {
 //get controllers
 export const getMainSubsList = async (req: Request, res: Response) => {
   try {
-    console.log("a");
     const mainSubs = await getMainSubsAndDateList();
     return res.status(200).json({
       status: 200,
