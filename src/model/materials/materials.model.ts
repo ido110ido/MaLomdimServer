@@ -6,11 +6,8 @@ export interface IMaterials {
   description: string;
   body: string;
   category: string;
-<<<<<<< Updated upstream
-  codeType: string;
-=======
   codeType:string;
->>>>>>> Stashed changes
+\
 }
 const materialsSchema: Schema = new Schema<IMaterials>({
   idSubTopic: { type: String, required: true },
@@ -18,11 +15,7 @@ const materialsSchema: Schema = new Schema<IMaterials>({
   description: { type: String, required: false },
   body: { type: String, required: true },
   category: { type: String, required: true },
-<<<<<<< Updated upstream
   codeType: { type: String, required: false },
-=======
-  codeType:{ type: String, required: false },
->>>>>>> Stashed changes
 });
 
 const materialsModel: Model<IMaterials> = mongoose.model<IMaterials>(
