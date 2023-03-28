@@ -1,15 +1,9 @@
 import MainSubModel, { IMainSub } from "../../model/mainSub/mainSub.model";
-import { IMaterials } from "../../model/materials/materials.model";
-import { ISubTopics } from "../../model/subTopics/subTopics.model";
-import {
-  getSubTopicsMaterials,
-  removeSubTopicMaterials,
-} from "../materials/materials.services";
+import { getSubTopicsMaterials } from "../materials/materials.services";
 import {
   getMainSubSubTopic,
   removeMainSubTopics,
 } from "../subTopics/subTopics.services";
-import { Model, ObjectId } from "mongoose";
 const dayNumVal: number = 86400000;
 interface IMainSubDatesValue {
   id: string;
@@ -99,7 +93,7 @@ export const addingMainSub = async (mainSub: IMainSub) => {
     if (count === 1) {
       _newMainSub.head = true;
       await _newMainSub.save();
-      return await MainSubModel.find();
+      return await getMainSubsAndDateList();
     }
 
     const lastMainSub = await MainSubModel.findOne({ nextMainSub: null });
@@ -112,7 +106,7 @@ export const addingMainSub = async (mainSub: IMainSub) => {
     _newMainSub.nextMainSub = null;
     await _newMainSub.save();
 
-    return await MainSubModel.find();
+    return await getMainSubsAndDateList();
   } catch (error: any) {
     throw new Error("Failed to add main subject: " + error.message);
   }
