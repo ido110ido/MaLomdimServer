@@ -21,7 +21,7 @@ export const getMainSubsAndDateList = async () => {
     let indexEndDate: number = 0;
     if (index) {
       index.endDate = index.startDate + index.numOfDays * dayNumVal;
-      indexEndDate = index.endDate + dayNumVal;
+      indexEndDate = index.endDate;
     }
     while (index?.nextMainSub || index != undefined) {
       mainSubInOrder.push(index);
@@ -31,7 +31,7 @@ export const getMainSubsAndDateList = async () => {
       if (index) {
         index.startDate = indexEndDate;
         index.endDate = indexEndDate + index.numOfDays * dayNumVal;
-        indexEndDate = index.endDate + dayNumVal;
+        indexEndDate = index.endDate;
       }
     }
     return mainSubInOrder;
