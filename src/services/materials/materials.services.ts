@@ -27,7 +27,16 @@ export const addingMaterials = async (Materials: IMaterials) => {
     const _newMaterials = await materialsModel.create(Materials);
     _newMaterials.save();
     return await materialsModel.find();
-  } catch (error:any) {
+  } catch (error: any) {
+    throw Error("adding Materials failed :" + error.message);
+  }
+};
+//admin add many material
+export const addingManyMaterials = async (Materials: IMaterials[]) => {
+  try {
+    const _newMaterials = await materialsModel.insertMany(Materials);
+    return await materialsModel.find();
+  } catch (error: any) {
     throw Error("adding Materials failed :" + error.message);
   }
 };

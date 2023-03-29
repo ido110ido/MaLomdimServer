@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import {
+  addingManyMaterials,
   addingMaterials,
   addingNoteMaterials,
   getSubTopicsMaterials,
@@ -55,6 +56,21 @@ export const addNewMaterialTeacher = async (req: Request, res: Response) => {
       status: 200,
       data: subTopics,
       message: "Successfully add material",
+    });
+  } catch (error: any) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+};
+export const addNewManyMaterialTeacher = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const subTopics = await addingManyMaterials(req.body);
+    return res.status(200).json({
+      status: 200,
+      data: subTopics,
+      message: "Successfully added many material",
     });
   } catch (error: any) {
     return res.status(400).json({ status: 400, message: error.message });

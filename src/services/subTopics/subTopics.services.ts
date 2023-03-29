@@ -17,11 +17,15 @@ export const addingSubTopics = async (subTopics: ISubTopics) => {
   try {
     const _newSubTopics = await subTopicsModel.create(subTopics);
     _newSubTopics.save();
-    return await subTopicsModel.find();
+    return {
+      subTopicsList: await subTopicsModel.find(),
+      addedSubTopic: _newSubTopics._id.toString(),
+    };
   } catch (error: any) {
     throw Error("adding subTopics failed: " + error.message);
   }
 };
+
 //update sub topic
 export const updateSubTopics = async (
   id: string,
