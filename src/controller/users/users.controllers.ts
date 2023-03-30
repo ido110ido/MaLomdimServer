@@ -48,6 +48,7 @@ exports.signUp = async (req: Request, res: Response) => {
     }
     //Encrypt user password
     const encryptedPassword = await bcrypt.hash(password, 10);
+    console.log('encrypted');
     // Create user in our database
     const user = await UsersModel.create({
       first_name,

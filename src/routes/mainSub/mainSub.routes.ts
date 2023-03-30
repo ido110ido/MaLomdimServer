@@ -14,7 +14,6 @@ const router = express.Router();
 router.get("/", getMainSubsList);
 router.get("/today", getTodayMainSub);
 router.get("/singleSub", getSingleMainSub); // need id: string
-
 //add
 router.post("/", addNewMainSubject);
 //update
