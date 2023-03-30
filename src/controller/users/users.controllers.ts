@@ -26,6 +26,7 @@ exports.logIn = async (req: Request, res: Response) => {
       return res.status(200).json({
         first_name: user.first_name,
         last_name: user.last_name,
+        role: user.role,
         token: token,
       });
     }
@@ -68,6 +69,7 @@ exports.signUp = async (req: Request, res: Response) => {
     res.status(201).json({
       first_name: user.first_name,
       last_name: user.last_name,
+      role: user.role,
       token: token,
     });
   } catch (err) {
