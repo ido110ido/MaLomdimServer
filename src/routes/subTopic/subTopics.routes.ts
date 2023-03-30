@@ -17,5 +17,4 @@ router.post("/", addNewSubTopic);
 router.post("/update", updateSubTopic); // need id: string, title: string, idMainSub: number
 //remove
 router.delete("/", removeSubTopic); // need id: string
-router.delete("/mainSub", removeMainSubTopic); // need id: string
 export default router;
