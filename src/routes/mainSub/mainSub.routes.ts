@@ -2,7 +2,6 @@ import express from "express";
 import {
   addNewMainSubject,
   getMainSubsList,
-  getSingleMainSub,
   getTodayMainSub,
   removeMainSubject,
   updateMainSubject,
@@ -13,7 +12,7 @@ const router = express.Router();
 
 router.get("/", getMainSubsList);
 router.get("/today", getTodayMainSub);
-router.get("/singleSub", getSingleMainSub); // need id: string
+// router.get("/singleSub", getSingleMainSub); // need id: string
 
 //add
 router.post("/", addNewMainSubject);

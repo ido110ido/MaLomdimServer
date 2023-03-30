@@ -21,19 +21,19 @@ export const getMainSubsList = async (req: Request, res: Response) => {
     return res.status(400).json({ status: 400, message: e.message });
   }
 };
-export const getSingleMainSub = async (req: Request, res: Response) => {
-  try {
-    // Get the 'id' parameter from the request URL
-    const mainSubs = await getSingleMainSubData(req.body.id);
-    return res.status(200).json({
-      status: 200,
-      data: mainSubs,
-      message: "Successfully one Main Subs List Retrieved",
-    });
-  } catch (e: any) {
-    return res.status(400).json({ status: 400, message: e.message });
-  }
-};
+// export const getSingleMainSub = async (req: Request, res: Response) => {
+//   try {
+//     // Get the 'id' parameter from the request URL
+//     const mainSubs = await getSingleMainSubData(req.body.id);
+//     return res.status(200).json({
+//       status: 200,
+//       data: mainSubs,
+//       message: "Successfully one Main Subs List Retrieved",
+//     });
+//   } catch (e: any) {
+//     return res.status(400).json({ status: 400, message: e.message });
+//   }
+// };
 export const getTodayMainSub = async (req: Request, res: Response) => {
   try {
     // Get the 'id' parameter from the request URL

@@ -22,6 +22,6 @@ router.post("/", addNewMaterialTeacher); // need idMainSub:string
 router.post("/teacher/update", adminVerify("teacher"), updateMaterialTeacher); // need id: string, title: string, idMainSub: number
 router.post("/update", adminVerify("student"), updateMaterialStudent); // need id: string, title: string, idMainSub: number ,idMainSub:string
 //remove
-router.delete("/teacher", adminVerify("teacher"), removeMaterialsTeacher); // need id: string
+router.delete("/teacher", removeMaterialsTeacher); // need id: string
 router.delete("/", adminVerify("student"), removeMaterialsStudent); // need id: string, idMainSub:string
 export default router;

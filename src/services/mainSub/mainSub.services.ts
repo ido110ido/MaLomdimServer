@@ -15,8 +15,10 @@ interface IMainSubDatesValue {
 //get all main subs - its working :)
 export const getMainSubsAndDateList = async () => {
   try {
+    const today = Date.now();
     const _mainSubs = await MainSubModel.find();
     const mainSubInOrder: IMainSub[] = [];
+    //add to main sub list the end and start date
     let index = _mainSubs.find((obj) => obj.head === true);
     let indexEndDate: number = 0;
     if (index) {
@@ -34,7 +36,16 @@ export const getMainSubsAndDateList = async () => {
         indexEndDate = index.endDate;
       }
     }
-    return mainSubInOrder;
+    // Find the main subject that is being learned today
+    const todayMainSub =
+      mainSubInOrder.find(
+        (obj) => today >= obj.startDate && today <= obj.endDate
+      ) || null;
+
+    return {
+      todaySub: todayMainSub,
+      mainSubList: mainSubInOrder,
+    };
   } catch (error) {
     throw Error("Error while getting main subjects data");
   }
@@ -71,20 +82,20 @@ export const getSingleMainSubData = async (id: string) => {
 //get today data of single main sub- its working :)
 export const getTodayMainSubMaterials = async () => {
   try {
-    // Get the current time in milliseconds
-    const today = Date.now();
-    const listMainSub: IMainSub[] = await getMainSubsAndDateList();
-    // Find the main subject that is being learned today
-    const todayMainSub =
-      listMainSub.find(
-        (obj) => today >= obj.startDate && today <= obj.endDate
-      ) || null;
-    if (!todayMainSub) {
-      throw new Error("There are no main subjects today");
-    }
-    // Get the data for the main subject being learned today
-    // return await getSingleMainSubData(todayMainSub.id);
-    return todayMainSub;
+    // // Get the current time in milliseconds
+    // const today = Date.now();
+    // const listMainSub: IMainSub[] = await getMainSubsAndDateList();
+    // // Find the main subject that is being learned today
+    // const todayMainSub =
+    //   listMainSub.find(
+    //     (obj) => today >= obj.startDate && today <= obj.endDate
+    //   ) || null;
+    // if (!todayMainSub) {
+    //   throw new Error("There are no main subjects today");
+    // }
+    // // Get the data for the main subject being learned today
+    // // return await getSingleMainSubData(todayMainSub.id);
+    // return todayMainSub;
   } catch (error) {
     throw Error("Error while getting today's main subject data");
   }
@@ -227,7 +238,7 @@ export const removeMainSub = async (id: string) => {
     await MainSubModel.findByIdAndDelete(id);
 
     // Return all remaining main subs
-    return MainSubModel.find();
+    return await getMainSubsAndDateList();
   } catch (error) {
     throw new Error("Error while removing main subject data");
   }
