@@ -52,6 +52,10 @@ exports.signUp = async (req: Request, res: Response) => {
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
     }
+    const teacher = await UsersModel.findOne({ role: "teacher" });
+    if (!teacher?.studentEmailList.includes(email)) {
+      return res.status(409).send("not invited email");
+    }
     //Encrypt user password
     const encryptedPassword = await bcrypt.hash(password, 10);
     // Create user in our database
@@ -61,6 +65,7 @@ exports.signUp = async (req: Request, res: Response) => {
       email: email.toLowerCase(), // sanitize: convert email to lowercase
       password: encryptedPassword,
     });
+    if (!teacher) user.role = "teacher";
     user.save();
     // Create token
     const token = jwt.sign(
@@ -84,7 +89,7 @@ exports.signUp = async (req: Request, res: Response) => {
 
 exports.getStudent = async (req: Request, res: Response) => {
   try {
-    const teacherId: string = req.body.id;
+    const teacherId: string = res.locals.UserId;
     const studentEmails = await getStudentEmailList(teacherId);
     return res.status(200).json({
       status: 200,
@@ -98,12 +103,12 @@ exports.getStudent = async (req: Request, res: Response) => {
 
 exports.addingStudent = async (req: Request, res: Response) => {
   try {
-    const teacherId: string = res.locals.UserId;
-    // const studentEmails = await addingStudentEmail(req.body, teacherId);
-    const studentEmails = await addingStudentEmail(
-      req.body,
-      "6425c79028ae5d9182ec4fee"
-    );
+    const teacherId = res.locals.UserId; // get the user ID from res.locals
+    const emails = req.body.map((item: { email: any }) => item.email); // get the user ID from res.locals
+    console.log(teacherId);
+    console.log(req.body);
+
+    const studentEmails = await addingStudentEmail(emails, teacherId);
     return res.status(200).json({
       status: 200,
       data: studentEmails,
@@ -117,11 +122,7 @@ exports.addingStudent = async (req: Request, res: Response) => {
 exports.removingStudent = async (req: Request, res: Response) => {
   try {
     const teacherId: string = res.locals.UserId;
-    // const studentEmails = await removeStudentEmail(req.body, teacherId);
-    const studentEmails = await removeStudentEmail(
-      req.body.email,
-      "6425c79028ae5d9182ec4fee"
-    );
+    const studentEmails = await removeStudentEmail(req.body.student, teacherId);
     return res.status(200).json({
       status: 200,
       data: studentEmails,
