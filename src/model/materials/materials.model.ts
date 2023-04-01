@@ -6,8 +6,8 @@ export interface IMaterials {
   description: string;
   body: string;
   category: string;
-  codeType:string;
-
+  codeType: string;
+  publisher: string;
 }
 const materialsSchema: Schema = new Schema<IMaterials>({
   idSubTopic: { type: String, required: true },
@@ -16,6 +16,7 @@ const materialsSchema: Schema = new Schema<IMaterials>({
   body: { type: String, required: true },
   category: { type: String, required: true },
   codeType: { type: String, required: false },
+  publisher: { type: String, required: false },
 });
 
 const materialsModel: Model<IMaterials> = mongoose.model<IMaterials>(

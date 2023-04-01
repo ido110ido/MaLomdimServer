@@ -2,6 +2,11 @@ import { Request, Response } from "express";
 import UsersModel from "../../model/users/users.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import {
+  addingStudentEmail,
+  getStudentEmailList,
+  removeStudentEmail,
+} from "../../services/users/user.services";
 require("dotenv").config();
 exports.logIn = async (req: Request, res: Response) => {
   try {
@@ -17,7 +22,7 @@ exports.logIn = async (req: Request, res: Response) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       // Create token
       const token = jwt.sign(
-        { user_id: user._id, email, userType: user.role },
+        { user_id: user._id, email, role: user.role },
         process.env.TOKEN_KEY as string,
         {
           expiresIn: "2h",
@@ -59,7 +64,7 @@ exports.signUp = async (req: Request, res: Response) => {
     user.save();
     // Create token
     const token = jwt.sign(
-      { user_id: user._id, email, userType: user.role },
+      { user_id: user._id, email, role: user.role },
       process.env.TOKEN_KEY as string,
       {
         expiresIn: "2h",
@@ -74,5 +79,55 @@ exports.signUp = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.log(err);
+  }
+};
+
+exports.getStudent = async (req: Request, res: Response) => {
+  try {
+    const teacherId: string = req.body.id;
+    const studentEmails = await getStudentEmailList(teacherId);
+    return res.status(200).json({
+      status: 200,
+      data: studentEmails,
+      message: "Successfully get student Emails list",
+    });
+  } catch (error: any) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+};
+
+exports.addingStudent = async (req: Request, res: Response) => {
+  try {
+    const teacherId: string = res.locals.UserId;
+    // const studentEmails = await addingStudentEmail(req.body, teacherId);
+    const studentEmails = await addingStudentEmail(
+      req.body,
+      "6425c79028ae5d9182ec4fee"
+    );
+    return res.status(200).json({
+      status: 200,
+      data: studentEmails,
+      message: "Successfully add student Emails",
+    });
+  } catch (error: any) {
+    return res.status(400).json({ status: 400, message: error.message });
+  }
+};
+
+exports.removingStudent = async (req: Request, res: Response) => {
+  try {
+    const teacherId: string = res.locals.UserId;
+    // const studentEmails = await removeStudentEmail(req.body, teacherId);
+    const studentEmails = await removeStudentEmail(
+      req.body.email,
+      "6425c79028ae5d9182ec4fee"
+    );
+    return res.status(200).json({
+      status: 200,
+      data: studentEmails,
+      message: "Successfully remove student Emails",
+    });
+  } catch (error: any) {
+    return res.status(400).json({ status: 400, message: error.message });
   }
 };

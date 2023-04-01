@@ -6,6 +6,7 @@ export interface IUsers {
   email: string;
   password: string;
   role: string;
+  studentEmailList: string[];
 }
 const userSchema: Schema = new Schema<IUsers>({
   first_name: { type: String, default: null },
@@ -13,6 +14,7 @@ const userSchema: Schema = new Schema<IUsers>({
   email: { type: String, unique: true },
   password: { type: String },
   role: { type: String, default: "student" },
+  studentEmailList: { type: [String], required: false },
 });
 
 const UsersModel: Model<IUsers> = mongoose.model<IUsers>("users", userSchema);

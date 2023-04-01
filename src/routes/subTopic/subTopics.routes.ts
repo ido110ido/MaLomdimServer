@@ -7,14 +7,14 @@ import {
   updateSubTopic,
 } from "../../controller/subTopic/subTopic.controllers";
 
-// const verify = require("../verifay/verifay");
+import { adminVerify } from "../../verifay/verifay";
 const router = express.Router();
 
 router.get("/", getMainSubsTopic);
 //add
-router.post("/", addNewSubTopic);
+router.post("/", adminVerify("teacher"), addNewSubTopic);
 //update
 router.post("/update", updateSubTopic); // need id: string, title: string, idMainSub: number
 //remove
-router.delete("/", removeSubTopic); // need id: string
+router.delete("/", adminVerify("teacher"), removeSubTopic); // need id: string
 export default router;

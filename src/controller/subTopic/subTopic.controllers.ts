@@ -23,6 +23,8 @@ export const getMainSubsTopic = async (req: Request, res: Response) => {
 // add controllers
 export const addNewSubTopic = async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
+
     const subTopics = await addingSubTopics(req.body);
     return res.status(200).json({
       status: 200,

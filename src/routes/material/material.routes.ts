@@ -16,12 +16,12 @@ const router = express.Router();
 router.get("/", getMaterialsTeacher);
 //add
 router.post("/teacher", addNewMaterialTeacher);
-router.post("/many", addNewManyMaterialTeacher);
+router.post("/many", adminVerify("teacher"), addNewManyMaterialTeacher);
 router.post("/", addNewMaterialTeacher); // need idMainSub:string
 //update
 router.post("/teacher/update", adminVerify("teacher"), updateMaterialTeacher); // need id: string, title: string, idMainSub: number
 router.post("/update", adminVerify("student"), updateMaterialStudent); // need id: string, title: string, idMainSub: number ,idMainSub:string
 //remove
-router.delete("/teacher", removeMaterialsTeacher); // need id: string
+router.delete("/teacher", adminVerify("teacher"), removeMaterialsTeacher); // need id: string
 router.delete("/", adminVerify("student"), removeMaterialsStudent); // need id: string, idMainSub:string
 export default router;
