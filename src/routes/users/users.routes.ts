@@ -12,4 +12,6 @@ router.delete(
   adminVerify("teacher"),
   usersController.removingStudent
 );
+//email
+router.get("/email", usersController.sendEmail);
 export default router;
