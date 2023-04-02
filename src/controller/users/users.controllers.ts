@@ -160,7 +160,7 @@ exports.sendEmail = async (req: Request, res: Response) => {
   sendSmtpEmail.subject = "invitation to Course";
   sendSmtpEmail.htmlContent = `<h1>congratulations on starting your course 🎉🎉🎉🎉</h1>
   <h2>hey, ${sendSmtpEmail.to[0].email}we are happy to here you will join our new course</h2>
-  <h3>go to: http://localhost:3000/sign-up and register</h3>
+  <h3>go to: https://malomdim.onrender.com and register</h3>
   <br/>
   <br/>
   <span>Good Luck!</span>`;
