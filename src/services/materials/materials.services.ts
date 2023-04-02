@@ -22,9 +22,13 @@ export const removeNoteMaterial = async (id: string, idMainSub: string) => {
   }
 };
 //admin add one material
-export const addingMaterials = async (Materials: IMaterials) => {
+export const addingMaterials = async (
+  Materials: IMaterials,
+  publisher: string
+) => {
   try {
     const _newMaterials = await materialsModel.create(Materials);
+    _newMaterials.publisher = publisher;
     _newMaterials.save();
     return await materialsModel.find();
   } catch (error: any) {
@@ -38,19 +42,6 @@ export const addingManyMaterials = async (Materials: IMaterials[]) => {
     return await materialsModel.find();
   } catch (error: any) {
     throw Error("adding Materials failed :" + error.message);
-  }
-};
-// user add note
-export const addingNoteMaterials = async (
-  idMainSub: string,
-  Materials: IMaterials
-) => {
-  try {
-    const _newMaterials = await materialsModel.create(Materials);
-    _newMaterials.save();
-    return await getMainSubMaterials(idMainSub);
-  } catch (error: any) {
-    throw Error("adding Materials failed: " + error.message);
   }
 };
 //admin update material

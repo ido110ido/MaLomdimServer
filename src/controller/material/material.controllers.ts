@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import {
   addingManyMaterials,
   addingMaterials,
-  addingNoteMaterials,
   getSubTopicsMaterials,
   removeMaterial,
   removeNoteMaterial,
@@ -49,12 +48,13 @@ export const removeMaterialsStudent = async (req: Request, res: Response) => {
   }
 };
 // add controllers
-export const addNewMaterialTeacher = async (req: Request, res: Response) => {
+export const addNewMaterial = async (req: Request, res: Response) => {
   try {
-    const subTopics = await addingMaterials(req.body);
+    const publisher: string = res.locals.name;
+    const _Material = await addingMaterials(req.body, publisher);
     return res.status(200).json({
       status: 200,
-      data: subTopics,
+      data: _Material,
       message: "Successfully add material",
     });
   } catch (error: any) {
@@ -76,19 +76,7 @@ export const addNewManyMaterialTeacher = async (
     return res.status(400).json({ status: 400, message: error.message });
   }
 };
-export const addNewMaterialStudent = async (req: Request, res: Response) => {
-  try {
-    const { idMainSub, Materials } = req.body;
-    const subTopics = await addingNoteMaterials(idMainSub, Materials);
-    return res.status(200).json({
-      status: 200,
-      data: subTopics,
-      message: "Successfully add material",
-    });
-  } catch (error: any) {
-    return res.status(400).json({ status: 400, message: error.message });
-  }
-};
+
 //update
 export const updateMaterialTeacher = async (req: Request, res: Response) => {
   try {

@@ -12,9 +12,11 @@ export const adminVerify = (role: string) => {
       const user = jwt.verify(token, process.env.TOKEN_KEY as string) as {
         user_id: string;
         role: string;
+        name: string;
       };
       if (user.role === role) {
         res.locals.UserId = user.user_id;
+        res.locals.name = user.name;
         next();
       } else {
         return res

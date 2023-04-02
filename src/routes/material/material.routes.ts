@@ -1,7 +1,7 @@
 import express from "express";
 import {
   addNewManyMaterialTeacher,
-  addNewMaterialTeacher,
+  addNewMaterial,
   getMaterialsTeacher,
   removeMaterialsStudent,
   removeMaterialsTeacher,
@@ -15,9 +15,8 @@ const router = express.Router();
 //get
 router.get("/", getMaterialsTeacher);
 //add
-router.post("/teacher", addNewMaterialTeacher);
 router.post("/many", adminVerify("teacher"), addNewManyMaterialTeacher);
-router.post("/", addNewMaterialTeacher); // need idMainSub:string
+router.post("/", adminVerify("student"), addNewMaterial); // need idMainSub:string
 //update
 router.post("/teacher/update", adminVerify("teacher"), updateMaterialTeacher); // need id: string, title: string, idMainSub: number
 router.post("/update", adminVerify("student"), updateMaterialStudent); // need id: string, title: string, idMainSub: number ,idMainSub:string
