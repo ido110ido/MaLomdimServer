@@ -29,7 +29,6 @@ export const addingMaterials = async (
   try {
     const _newMaterials = await materialsModel.create(Materials);
     _newMaterials.publisher = publisher;
-    console.log(_newMaterials);
     _newMaterials.save();
     return await materialsModel.find();
   } catch (error: any) {

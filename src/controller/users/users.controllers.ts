@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import UsersModel from "../../model/users/users.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 const Sib = require("sib-api-v3-sdk");
 import {
   addingStudentEmail,
@@ -117,8 +116,6 @@ exports.addingStudent = async (req: Request, res: Response) => {
   try {
     const teacherId = res.locals.UserId; // get the user ID from res.locals
     const emails = req.body.map((item: { email: any }) => item.email); // get the user ID from res.locals
-    console.log(teacherId);
-    console.log(req.body);
 
     const studentEmails = await addingStudentEmail(emails, teacherId);
     return res.status(200).json({

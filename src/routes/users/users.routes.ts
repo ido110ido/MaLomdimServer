@@ -13,5 +13,5 @@ router.delete(
   usersController.removingStudent
 );
 //email
-router.get("/email", usersController.sendEmail);
+router.post("/email", usersController.sendEmail);
 export default router;
